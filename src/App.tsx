@@ -1,9 +1,10 @@
 import { ChangeEvent, useState } from 'react';
 import './App.css';
-import { removeStopwords, eng, porBr } from 'stopword';
+// import { removeStopwords, eng, porBr } from 'stopword';
 import { Sun, MoonStar } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { stopwordsEN, stopwordsPT } from './utils/stopwords';
 
 function App() {
   const [text, setText] = useState<string>('');
@@ -19,6 +20,10 @@ function App() {
     setLanguage(e.target.value as 'pt' | 'en');
   };
 
+  const removePunctuation = (text: string): string => {
+    return text.replace(/[^\w\s]/g, '');
+  };
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const file = e.target.files?.[0];
     if (file) {
@@ -30,13 +35,20 @@ function App() {
     }
   };
 
+  const removeStopwords = (text: string[], language: 'pt' | 'en'): string[] => {
+    if (language === 'pt') {
+      return text.filter((word) => !stopwordsPT.includes(word.toLowerCase()));
+    } else {
+      return text.filter((word) => !stopwordsEN.includes(word.toLowerCase()));
+    }
+  };
+
   const normalizeText = (): void => {
     const words = text.split(/\s+/);
-    const normalizedWords = removeStopwords(
-      words,
-      language === 'pt' ? porBr : eng
-    );
-    setNormalizedText(normalizedWords.join(' ').toLocaleLowerCase());
+    const normalizedWords = removeStopwords(words, language);
+    const textLowerCase = normalizedWords.join(' ').toLocaleLowerCase();
+    const textWithoutPunctuation = removePunctuation(textLowerCase);
+    setNormalizedText(textWithoutPunctuation);
   };
 
   const exportToFile = () => {
