@@ -34,6 +34,16 @@ function App() {
     setNormalizedText(normalizedWords.join(' '));
   };
 
+  const exportToFile = () => {
+    const blob = new Blob([normalizedText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'texto_normalizado.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div>
       <h1>Remover Stopwords e Normalizar Texto</h1>
@@ -59,6 +69,9 @@ function App() {
       <button onClick={normalizeText}>Normalizar Texto</button>
       <h2>Texto Normalizado:</h2>
       <textarea rows={10} cols={50} value={normalizedText} readOnly />
+      {normalizedText && (
+        <button onClick={exportToFile}>Exportar Arquivo</button>
+      )}
     </div>
   );
 }
