@@ -2,6 +2,8 @@ import { ChangeEvent, useState } from 'react';
 import './App.css';
 import { removeStopwords, eng, porBr } from 'stopword';
 // import { stopwordsEN, stopwordsPT } from './utils/stopwords';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [text, setText] = useState<string>('');
@@ -45,6 +47,20 @@ function App() {
     a.download = 'texto_normalizado.txt';
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const copyText = () => {
+    navigator.clipboard.writeText(normalizedText);
+    toast.success('Texto copiado!', {
+      position: 'top-right',
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'colored',
+    });
   };
 
   return (
@@ -95,21 +111,29 @@ function App() {
           <h2 className="text-xl font-semibold mt-6 mb-2">
             Texto Normalizado:
           </h2>
+
           <textarea
+            onClick={copyText}
             rows={10}
-            className="w-full border border-gray-300 rounded-md p-2 mb-4"
+            className="w-full border border-gray-300 rounded-md p-2 mb-4 cursor-pointer"
             value={normalizedText}
             readOnly
           />
 
-          <button
-            onClick={exportToFile}
-            className="bg-green-500 text-white rounded-lg px-4 py-2 hover:bg-green-600 transition duration-200"
-          >
-            Exportar Arquivo
-          </button>
+          <div className="flex items-center justify-between">
+            <span className="tooltip">Clique na texto para copiar 👆</span>
+
+            <button
+              onClick={exportToFile}
+              className="bg-green-500 text-white rounded-lg px-4 py-2 hover:bg-green-600 transition duration-200"
+            >
+              Exportar Arquivo
+            </button>
+          </div>
         </>
       )}
+
+      <ToastContainer />
     </div>
   );
 }
