@@ -1,0 +1,21 @@
+.light {
+  background-color: white;
+  color: black;
+}
+
+.dark {
+  background-color: #121212;
+  color: white;
+}
+
+textarea,
+select,
+button {
+  background-color: inherit;
+  color: inherit;
+  border: 1px solid currentColor;
+}
+
+button {
+  cursor: pointer;
+}
