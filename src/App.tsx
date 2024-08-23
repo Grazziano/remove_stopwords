@@ -1,52 +1,65 @@
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import './App.css';
-import { stopwords } from './utils/stopwords';
+import { removeStopwords } from 'stopword';
+import { stopwordsEN, stopwordsPT } from './utils/stopwords';
 
 function App() {
   const [text, setText] = useState<string>('');
-  const [processedText, setProcessedText] = useState<string>('');
+  const [language, setLanguage] = useState<'pt' | 'en'>('pt');
+  const [normalizedText, setNormalizedText] = useState<string>('');
 
-  function removeStopwords(text: string) {
-    return text
-      .split(' ')
-      .filter((word) => !stopwords.includes(word.toLowerCase()))
-      .join(' ');
-  }
+  const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
+    setText(e.target.value);
+  };
 
-  function normalizeText(text: string) {
-    return text.toLowerCase();
-  }
+  const handleLanguageChange = (e: ChangeEvent<HTMLSelectElement>): void => {
+    setLanguage(e.target.value as 'pt' | 'en');
+  };
 
-  function processText() {
-    const newNormalizeText = normalizeText(text);
-    const textWithoutStopwords = removeStopwords(newNormalizeText);
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setText(event.target?.result as string);
+      };
+      reader.readAsText(file);
+    }
+  };
 
-    setProcessedText(textWithoutStopwords);
-    console.log(textWithoutStopwords);
-  }
+  const normalizeText = (): void => {
+    const words = text.split(/\s+/);
+    const stopwords = language === 'pt' ? stopwordsPT : stopwordsEN;
+    const normalizedWords = removeStopwords(words, stopwords);
+    setNormalizedText(normalizedWords.join(' '));
+  };
 
   return (
-    <>
+    <div>
       <h1>Remover Stopwords e Normalizar Texto</h1>
-
       <textarea
-        id="inputText"
         rows={10}
         cols={50}
-        placeholder="Cole seu texto aqui..."
         value={text}
-        onChange={(e) => setText(e.target.value)}
-      ></textarea>
-      <br />
-      <input type="file" id="fileInput" />
-      <br />
-      <button onClick={processText}>Processar Texto</button>
-
-      <h2>Texto Processado:</h2>
-
-      <br />
-      <span>{processedText}</span>
-    </>
+        onChange={handleTextChange}
+        placeholder="Cole seu texto aqui..."
+      />
+      <div>
+        <input type="file" onChange={handleFileChange} accept=".txt" />
+      </div>
+      <div>
+        <label>
+          Idioma:
+          <select value={language} onChange={handleLanguageChange}>
+            <option value="pt">Português</option>
+            <option value="en">Inglês</option>
+          </select>
+        </label>
+      </div>
+      <button onClick={normalizeText}>Normalizar Texto</button>
+      <h2>Texto Normalizado:</h2>
+      <textarea rows={10} cols={50} value={normalizedText} readOnly />
+    </div>
   );
 }
 
