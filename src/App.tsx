@@ -20,8 +20,8 @@ function App() {
     setLanguage(e.target.value as 'pt' | 'en');
   };
 
-  const removePunctuation = (text: string): string => {
-    return text.replace(/[^\w\s]/g, '');
+  const removePunctuationKeepAccents = (text: string): string => {
+    return text.replace(/[\.,!;:\?\"'\(\)$${}<>]/g, '');
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -47,7 +47,7 @@ function App() {
     const words = text.split(/\s+/);
     const normalizedWords = removeStopwords(words, language);
     const textLowerCase = normalizedWords.join(' ').toLocaleLowerCase();
-    const textWithoutPunctuation = removePunctuation(textLowerCase);
+    const textWithoutPunctuation = removePunctuationKeepAccents(textLowerCase);
     setNormalizedText(textWithoutPunctuation);
   };
 
