@@ -1,10 +1,10 @@
 import { ChangeEvent, useState } from 'react';
-import './App.css';
 // import { removeStopwords, eng, porBr } from 'stopword';
 import { Sun, MoonStar } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { stopwordsEN, stopwordsPT } from './utils/stopwords';
+import './App.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [text, setText] = useState<string>('');
