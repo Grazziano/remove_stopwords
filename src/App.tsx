@@ -1,5 +1,4 @@
 import { ChangeEvent, useState } from 'react';
-// import { removeStopwords, eng, porBr } from 'stopword';
 import { Sun, MoonStar } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import { stopwordsEN, stopwordsPT } from './utils/stopwords';
@@ -11,6 +10,7 @@ function App() {
   const [language, setLanguage] = useState<'pt' | 'en'>('pt');
   const [normalizedText, setNormalizedText] = useState<string>('');
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
     setText(e.target.value);
@@ -49,6 +49,7 @@ function App() {
     const textLowerCase = normalizedWords.join(' ').toLocaleLowerCase();
     const textWithoutPunctuation = removePunctuationKeepAccents(textLowerCase);
     setNormalizedText(textWithoutPunctuation);
+    setIsModalOpen(true);
   };
 
   const exportToFile = () => {
@@ -79,79 +80,103 @@ function App() {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
-    <div className={`h-screen ${theme}`}>
-      <div className="max-w-2xl mx-auto p-4 shadow-lg rounded-lg">
-        <h1 className="text-2xl font-bold mb-4">
+    <div
+      className={`h-screen flex flex-col items-center justify-center ${theme}`}
+    >
+      <div className="w-full max-w-xl p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg transition duration-300 mb-6">
+        <h1 className="text-3xl font-bold mb-4 text-center text-gray-800 dark:text-white">
           Remover Stopwords e Normalizar Texto
         </h1>
 
-        <button onClick={toggleTheme} className="float-end border-none p-2">
-          {theme === 'light' ? <MoonStar /> : <Sun />}
+        <button
+          onClick={toggleTheme}
+          className="flex items-center justify-center float-right border-none p-2 transition duration-200"
+          title="Alternar Tema"
+        >
+          {theme === 'light' ? (
+            <MoonStar className="text-gray-600" />
+          ) : (
+            <Sun className="text-yellow-500" />
+          )}
         </button>
 
         <textarea
-          rows={10}
-          className="w-full border border-gray-300 rounded-md p-2 mb-4"
+          rows={8}
+          className="w-full border border-gray-300 rounded-md p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
           value={text}
           onChange={handleTextChange}
           placeholder="Cole seu texto aqui..."
         />
+
         <div className="mb-4">
           <input
             type="file"
             onChange={handleFileChange}
             accept=".txt"
-            className="border border-gray-300 rounded-md p-2"
+            className="w-full border border-gray-300 rounded-md p-3 bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        <div className="flex justify-between items-center">
-          <div className="mb-4">
-            <label className="block font-medium mb-2">
-              Idioma:
-              <select
-                value={language}
-                onChange={handleLanguageChange}
-                className="border border-gray-300 rounded-md p-2 ml-2"
-              >
-                <option value="pt">Português</option>
-                <option value="en">Inglês</option>
-              </select>
-            </label>
-          </div>
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+          <label className="block w-full sm:w-auto mb-2 sm:mb-0">
+            Idioma:
+            <select
+              value={language}
+              onChange={handleLanguageChange}
+              className="border border-gray-300 rounded-md p-2 ml-2 bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="pt">Português</option>
+              <option value="en">Inglês</option>
+            </select>
+          </label>
           <button
             onClick={normalizeText}
-            className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition duration-200"
+            className="mt-2 sm:mt-0 bg-blue-500 text-white rounded-lg px-4 py-3 hover:bg-blue-600 transition duration-200"
           >
             Normalizar Texto
           </button>
         </div>
       </div>
 
-      {normalizedText && (
-        <div className="max-w-2xl mx-auto p-4 shadow-lg rounded-lg">
-          <h2 className="text-xl font-semibold mt-6 mb-2">
-            Texto Normalizado:
-          </h2>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="w-full max-w-xl p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-semibold mt-4 mb-2 text-gray-800 dark:text-white">
+              Texto Normalizado:
+            </h2>
 
-          <textarea
-            onClick={copyText}
-            rows={10}
-            className="w-full border border-gray-300 rounded-md p-2 mb-4 cursor-pointer"
-            value={normalizedText}
-            readOnly
-          />
+            <textarea
+              onClick={copyText}
+              rows={8}
+              className="w-full border border-gray-300 rounded-md p-3 mb-4 cursor-pointer bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+              value={normalizedText}
+              readOnly
+            />
 
-          <div className="flex items-center justify-between">
-            <span className="tooltip">Clique na texto para copiar 👆</span>
+            <div className="flex items-center justify-between">
+              <span className="tooltip text-sm text-gray-500 dark:text-gray-400">
+                Clique no texto para copiar 👆
+              </span>
 
-            <button
-              onClick={exportToFile}
-              className="bg-green-500 text-white rounded-lg px-4 py-2 hover:bg-green-600 transition duration-200"
-            >
-              Exportar Arquivo
-            </button>
+              <button
+                onClick={exportToFile}
+                className="bg-green-500 text-white rounded-lg px-4 py-3 hover:bg-green-600 transition duration-200"
+              >
+                Exportar Arquivo
+              </button>
+
+              <button
+                onClick={closeModal}
+                className="bg-red-500 text-white rounded-lg px-4 py-3 hover:bg-red-600 transition duration-200"
+              >
+                Fechar
+              </button>
+            </div>
           </div>
         </div>
       )}
